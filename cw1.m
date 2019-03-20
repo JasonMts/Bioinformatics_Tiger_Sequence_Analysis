@@ -158,19 +158,72 @@ showalignment(similar_orfs);
 
 
 %find all proteins in human genome
+humanproteins={};
+tigerproteins={};
 for i = 1:6
+    %first get all proteins from human genome
     if(length(orf_h(i).Start) > length(orf_h(i).Stop))
             orf_h(i).Start = orf_h(i).Start(:,1:end-1);
     end;
-    
-    
+      
     if(length(orf_h(i).Stop) > 0)  
         for j = 1:length(orf_h(i).Stop)
             humanproteins = [humanproteins, seq_h(orf_h(i).Start(j):(orf_h(i).Stop(j)-1))];
         end;
-    end;       
+    end;
+    
+    %now let's get all proteins from tiger genome
+    if(length(orf(i).Start) > length(orf(i).Stop))
+            orf(i).Start = orf(i).Start(:,1:end-1);
+    end;
+      
+    if(length(orf(i).Stop) > 0)  
+        for j = 1:length(orf(i).Stop)
+            tigerproteins = [tigerproteins, seq(orf(i).Start(j):(orf(i).Stop(j)-1))];
+        end;
+    end;
 end;
 
+humanproteins={};
+tigerproteins={};
+for i = 1:6
+    %first get all proteins from human genome
+    if(length(orf_h(i).Start) > length(orf_h(i).Stop))
+            orf_h(i).Start = orf_h(i).Start(:,1:end-1);
+    end;
+      
+    if(length(orf_h(i).Stop) > 0)  
+        for j = 1:length(orf_h(i).Stop)
+            humanproteins = [humanproteins, nt2aa(seq_h(orf_h(i).Start(j):(orf_h(i).Stop(j)-1)), 'GENETICCODE', 2)];
+        end;
+    end;
+    
+    %now let's get all proteins from tiger genome
+    if(length(orf(i).Start) > length(orf(i).Stop))
+            orf(i).Start = orf(i).Start(:,1:end-1);
+    end;
+      
+    if(length(orf(i).Stop) > 0)  
+        for j = 1:length(orf(i).Stop)
+            tigerproteins = [tigerproteins, nt2aa(seq(orf(i).Start(j):(orf(i).Stop(j)-1)), 'GENETICCODE', 2)];
+        end;
+    end;
+end;
+
+
+%remember to search complement for last part
+protein_scores = []
+for i = 1:10
+    for j = 1:10
+        protein_scores = [protein_scores, nwalign(cell2mat(humanproteins(i)),cell2mat(tigerproteins(j)))];
+    end;
+end;
+
+[a,b] = nwalign(cell2mat(humanproteins(2)),cell2mat(tigerproteins(10)), 'ALPHABET', 'AA')
+
+perm = randperm(length(cell2mat(humanproteins(1))));
+
+nwalign(cell2mat(humanproteins(1)),randseq(length(cell2mat(humanproteins(1))),'ALPHABET', 'AA'))
 
 
 
